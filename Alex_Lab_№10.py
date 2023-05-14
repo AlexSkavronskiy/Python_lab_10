@@ -8,7 +8,6 @@ voices = tts.getProperty('voices')
 tts.setProperty('voices', 'en')
 
 for voice in voices:
-    print(voice.name)
     if voice.name == 'Microsoft Zira Desktop - English (United States)':
         tts.setProperty('voice', voice.id)
 
@@ -21,6 +20,7 @@ stream = pa.open(format=pyaudio.paInt16,
                  input=True,
                  frames_per_buffer=8000)
 stream.start_stream()
+
 
 def listen():
     while True:
@@ -37,11 +37,11 @@ def speak(say):
 
 
 def find_word(word):
-    url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}'
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        return data
+        return data[0]
     else:
         speak('Error while getting data')
         return None
@@ -50,12 +50,27 @@ def find_word(word):
 speak('start')
 
 for text in listen():
+
     if text == 'goodbye':
         speak('Goodbye!')
         break
+
     elif text == 'hello':
         speak("Hello! How can I help you?")
+
     elif 'find' in text:
         new_word = text.split()
         find = find_word(f'{new_word[len(new_word) - 1]}')
         print(find)
+
+    elif 'phonetic' in text:
+        new_word = text.split()
+        find = find_word(f'{new_word[len(new_word) - 1]}')
+        phonetic = find['phonetic']
+        print(phonetic)
+
+    elif 'meaning' in text:
+        new_word = text.split()
+        find = find_word(f"{new_word[len(new_word) - 1]}")
+        meaning = find['meanings']
+        print(meaning)
